@@ -65,34 +65,35 @@ export default function ConceptModal({
   const canSubmitQuiz = quiz && Object.keys(selectedAnswers).length === quiz.questions.length;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden">
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
+      <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden border border-yellow-100">
         {/* Header */}
-        <div className="bg-indigo-600 text-white p-4 flex items-center justify-between">
+        <div className="bg-yellow-400 text-gray-900 p-5 flex items-center justify-between rounded-t-3xl">
           <div className="flex items-center space-x-3">
-            <BookOpen className="h-6 w-6" />
-            <h2 className="text-xl font-semibold">{concept.title}</h2>
+            <BookOpen className="h-7 w-7 text-yellow-700" />
+            <h2 className="text-2xl font-bold tracking-tight">{concept.title}</h2>
             {isCompleted && (
-              <CheckCircle2 className="h-5 w-5 text-green-300" />
+              <CheckCircle2 className="h-5 w-5 text-green-500" />
             )}
           </div>
           <button
             onClick={onClose}
-            className="text-white hover:text-gray-200 transition-colors"
+            className="text-gray-700 hover:text-gray-900 transition-colors rounded-full p-1"
+            aria-label="Close"
           >
             <X className="h-6 w-6" />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="border-b border-gray-200">
-          <nav className="flex">
+        <div className="border-b border-gray-200 bg-gray-50">
+          <nav className="flex px-6 pt-2">
             <button
               onClick={() => setCurrentTab('article')}
-              className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+              className={`px-6 py-2 text-base font-semibold rounded-t-lg transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400 mr-2 ${
                 currentTab === 'article'
-                  ? 'border-indigo-500 text-indigo-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700'
+                  ? 'bg-white text-yellow-600 shadow'
+                  : 'bg-transparent text-gray-500 hover:text-yellow-600'
               }`}
             >
               Learn
@@ -100,10 +101,10 @@ export default function ConceptModal({
             {quiz && (
               <button
                 onClick={() => setCurrentTab('quiz')}
-                className={`px-6 py-3 text-sm font-medium border-b-2 transition-colors ${
+                className={`px-6 py-2 text-base font-semibold rounded-t-lg transition-colors focus:outline-none focus:ring-2 focus:ring-yellow-400 ${
                   currentTab === 'quiz'
-                    ? 'border-indigo-500 text-indigo-600'
-                    : 'border-transparent text-gray-500 hover:text-gray-700'
+                    ? 'bg-white text-yellow-600 shadow'
+                    : 'bg-transparent text-gray-500 hover:text-yellow-600'
                 }`}
               >
                 Quiz
@@ -113,9 +114,9 @@ export default function ConceptModal({
         </div>
 
         {/* Content */}
-        <div className="p-6 overflow-y-auto max-h-[calc(90vh-200px)]">
+        <div className="p-8 overflow-y-auto max-h-[calc(90vh-180px)] bg-white">
           {currentTab === 'article' && (
-            <div className="prose prose-indigo max-w-none">
+            <div className="prose max-w-none">
               {concept.article_content ? (
                 <div
                   className="text-gray-800 leading-relaxed"
@@ -123,8 +124,8 @@ export default function ConceptModal({
                 />
               ) : (
                 <div className="text-center py-8">
-                  <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-                  <p className="text-gray-600">
+                  <BookOpen className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+                  <p className="text-gray-500">
                     Article content for this concept will be available soon.
                   </p>
                 </div>
@@ -133,45 +134,43 @@ export default function ConceptModal({
           )}
 
           {currentTab === 'quiz' && quiz && (
-            <div className="space-y-6">
+            <div className="space-y-8">
               {quizSubmitted && quizScore !== null && (
-                <div className={`p-4 rounded-lg ${
+                <div className={`p-5 rounded-2xl flex items-center justify-between mb-6 ${
                   quizScore >= 80 
-                    ? 'bg-green-100 border border-green-200' 
-                    : 'bg-yellow-100 border border-yellow-200'
+                    ? 'bg-green-50 border border-green-200' 
+                    : 'bg-yellow-50 border border-yellow-200'
                 }`}>
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <h3 className={`font-semibold ${
-                        quizScore >= 80 ? 'text-green-800' : 'text-yellow-800'
-                      }`}>
-                        {quizScore >= 80 ? 'Congratulations!' : 'Keep trying!'}
-                      </h3>
-                      <p className={`text-sm ${
-                        quizScore >= 80 ? 'text-green-700' : 'text-yellow-700'
-                      }`}>
-                        You scored {quizScore}% {quizScore >= 80 ? '- Concept unlocked!' : '- You need 80% to pass.'}
-                      </p>
-                    </div>
-                    {quizScore < 80 && (
-                      <button
-                        onClick={handleQuizReset}
-                        className="flex items-center space-x-2 px-3 py-1 bg-yellow-200 text-yellow-800 rounded hover:bg-yellow-300 transition-colors"
-                      >
-                        <RotateCcw className="h-4 w-4" />
-                        <span>Try Again</span>
-                      </button>
-                    )}
+                  <div>
+                    <h3 className={`font-bold text-lg ${
+                      quizScore >= 80 ? 'text-green-700' : 'text-yellow-700'
+                    }`}>
+                      {quizScore >= 80 ? 'Congratulations!' : 'Keep trying!'}
+                    </h3>
+                    <p className={`text-base ${
+                      quizScore >= 80 ? 'text-green-600' : 'text-yellow-600'
+                    }`}>
+                      You scored {quizScore}% {quizScore >= 80 ? '- Concept unlocked!' : '- You need 80% to pass.'}
+                    </p>
                   </div>
+                  {quizScore < 80 && (
+                    <button
+                      onClick={handleQuizReset}
+                      className="flex items-center space-x-2 px-4 py-2 bg-yellow-400 text-yellow-900 rounded-lg hover:bg-yellow-500 transition-colors font-semibold"
+                    >
+                      <RotateCcw className="h-5 w-5" />
+                      <span>Try Again</span>
+                    </button>
+                  )}
                 </div>
               )}
 
               {quiz.questions.map((question, questionIndex) => (
-                <div key={question.id} className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-900 mb-3">
+                <div key={question.id} className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+                  <h4 className="font-semibold text-gray-900 mb-4 text-lg">
                     {questionIndex + 1}. {question.question}
                   </h4>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     {question.options.map((option, optionIndex) => {
                       const isSelected = selectedAnswers[question.id] === optionIndex;
                       const isCorrect = optionIndex === question.correctAnswer;
@@ -182,7 +181,7 @@ export default function ConceptModal({
                           key={optionIndex}
                           onClick={() => handleAnswerSelect(question.id, optionIndex)}
                           disabled={quizSubmitted}
-                          className={`w-full text-left p-3 rounded border transition-colors ${
+                          className={`w-full text-left p-4 rounded-xl border font-medium transition-colors text-base shadow-sm focus:outline-none focus:ring-2 focus:ring-yellow-400 ${
                             showResult
                               ? isCorrect
                                 ? 'bg-green-100 border-green-300 text-green-800'
@@ -190,8 +189,8 @@ export default function ConceptModal({
                                 ? 'bg-red-100 border-red-300 text-red-800'
                                 : 'bg-white border-gray-200 text-gray-600'
                               : isSelected
-                              ? 'bg-indigo-100 border-indigo-300 text-indigo-800'
-                              : 'bg-white border-gray-200 text-gray-700 hover:bg-gray-50'
+                              ? 'bg-yellow-100 border-yellow-400 text-yellow-800'
+                              : 'bg-white border-gray-200 text-gray-700 hover:bg-yellow-50'
                           }`}
                         >
                           {option}
@@ -200,8 +199,8 @@ export default function ConceptModal({
                     })}
                   </div>
                   {quizSubmitted && question.explanation && (
-                    <div className="mt-3 p-3 bg-blue-50 border-l-4 border-blue-200">
-                      <p className="text-sm text-blue-800">
+                    <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-300 rounded-xl">
+                      <p className="text-base text-yellow-800">
                         <strong>Explanation:</strong> {question.explanation}
                       </p>
                     </div>
@@ -210,11 +209,11 @@ export default function ConceptModal({
               ))}
 
               {!quizSubmitted && (
-                <div className="flex justify-end">
+                <div className="flex justify-end mt-6">
                   <button
                     onClick={handleQuizSubmit}
                     disabled={!canSubmitQuiz}
-                    className="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                    className="px-8 py-3 bg-yellow-500 text-white rounded-xl font-bold shadow hover:bg-yellow-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors text-base"
                   >
                     Submit Quiz
                   </button>
