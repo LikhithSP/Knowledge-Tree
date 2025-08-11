@@ -25,25 +25,25 @@ export default function DashboardClient({ roadmaps, user }: DashboardClientProps
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b">
+      <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center">
-              <h1 className="text-2xl font-bold text-indigo-600">Knowledge Tree</h1>
+              <h1 className="text-2xl font-bold text-gray-900">Knowledge Tree</h1>
             </div>
             <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <UserIcon className="h-5 w-5 text-gray-500" />
-                <span className="text-sm text-gray-700">{user.email}</span>
+              <div className="flex items-center space-x-2 bg-gray-100 px-3 py-2 rounded-full">
+                <UserIcon className="h-4 w-4 text-gray-600" />
+                <span className="text-sm text-gray-700 font-medium">{user.email}</span>
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center space-x-2 text-gray-500 hover:text-gray-700 transition-colors"
+                className="flex items-center space-x-2 text-gray-500 hover:text-red-600 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-red-50"
               >
-                <LogOut className="h-5 w-5" />
-                <span className="text-sm">Logout</span>
+                <LogOut className="h-4 w-4" />
+                <span className="text-sm font-medium">Logout</span>
               </button>
             </div>
           </div>
@@ -62,47 +62,56 @@ export default function DashboardClient({ roadmaps, user }: DashboardClientProps
         </div>
 
         {/* Roadmaps Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {roadmaps.length > 0 ? (
             roadmaps.map((roadmap) => (
               <div
                 key={roadmap.id}
                 onClick={() => handleRoadmapClick(roadmap.id)}
-                className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow duration-200 cursor-pointer border hover:border-indigo-200"
+                className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 hover:border-yellow-200 hover:-translate-y-1 overflow-hidden"
               >
-                <div className="p-6">
-                  <div className="flex items-center mb-4">
-                    <div className="bg-indigo-100 p-3 rounded-lg">
-                      <BookOpen className="h-8 w-8 text-indigo-600" />
+                <div className="p-8">
+                  <div className="flex items-start mb-6">
+                    <div className="bg-gradient-to-br from-yellow-400 to-yellow-500 p-4 rounded-2xl shadow-lg group-hover:shadow-yellow-200 transition-shadow duration-300">
+                      <BookOpen className="h-8 w-8 text-white" />
                     </div>
-                    <div className="ml-4">
-                      <h3 className="text-xl font-semibold text-gray-900">
+                    <div className="ml-5 flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 group-hover:text-yellow-600 transition-colors duration-200 leading-tight">
                         {roadmap.title}
                       </h3>
                     </div>
                   </div>
                   {roadmap.description && (
-                    <p className="text-gray-600 text-sm leading-relaxed">
+                    <p className="text-gray-600 text-sm leading-relaxed mb-6 line-clamp-3">
                       {roadmap.description}
                     </p>
                   )}
-                  <div className="mt-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-indigo-100 text-indigo-800">
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex items-center px-4 py-2 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800 group-hover:bg-yellow-200 transition-colors duration-200">
                       Start Learning
                     </span>
+                    <div className="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center group-hover:bg-yellow-100 transition-colors duration-200">
+                      <svg className="w-4 h-4 text-gray-600 group-hover:text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
               </div>
             ))
           ) : (
-            <div className="col-span-full text-center py-12">
-              <BookOpen className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 mb-2">
-                No roadmaps available yet
-              </h3>
-              <p className="text-gray-600">
-                Roadmaps will appear here once they are created. Check back soon!
-              </p>
+            <div className="col-span-full text-center py-16">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 max-w-md mx-auto">
+                <div className="bg-gray-100 p-6 rounded-2xl w-fit mx-auto mb-6">
+                  <BookOpen className="h-16 w-16 text-gray-400 mx-auto" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">
+                  No roadmaps available yet
+                </h3>
+                <p className="text-gray-600 leading-relaxed">
+                  Roadmaps will appear here once they are created. Check back soon to start your learning journey!
+                </p>
+              </div>
             </div>
           )}
         </div>

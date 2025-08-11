@@ -10,7 +10,7 @@
     "generate-content": "tsx scripts/generate-content.ts",
     "create-sample-data": "tsx scripts/create-sample-data.ts",
     "create-ai-content": "tsx scripts/create-ai-roadmap.ts",
-    "create-datascience-content": "tsx scripts/create-data-science-roadmap.ts", 
+    "create-datascience-content": "tsx scripts/create-data-science-roadmap.ts",
     "create-cybersecurity-content": "tsx scripts/create-cybersecurity-roadmap.ts",
     "create-mobile-content": "tsx scripts/create-mobile-dev-roadmap.ts",
     "create-cloud-content": "tsx scripts/create-cloud-computing-roadmap.ts",
@@ -21,6 +21,7 @@
     "remove-empty-roadmaps": "tsx scripts/remove-empty-roadmaps.ts"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@supabase/auth-ui-react": "^0.4.7",
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.54.0",
