@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
+// import { useRouter } from 'next/navigation'; // Ready for future navigation usage
 import Link from 'next/link';
 import Image from 'next/image';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
@@ -14,6 +15,7 @@ export default function SignUp() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState('');
+  // const router = useRouter(); // Ready for future navigation usage
   const supabase = createClient();
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -74,10 +76,13 @@ export default function SignUp() {
         
         {/* Main illustration area */}
         <div className="flex items-center justify-center w-full h-full relative z-10">
-          <img 
+          <Image 
             src="https://64.media.tumblr.com/798b1ae3e9f843b60ab8802813e9cb68/fc239968f5e39f7e-5b/s540x810/3d8643a8cba2b1d680c648fe871b56c14d5d9c27.gif"
             alt="Animated illustration"
+            width={540}
+            height={810}
             className="w-full h-full object-cover"
+            unoptimized
           />
         </div>
       </div>

@@ -35,18 +35,19 @@ export default function Login() {
     setLoading(false);
   };
 
-  const handleGoogleLogin = async () => {
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: 'google',
-      options: {
-        redirectTo: `${window.location.origin}/dashboard`,
-      },
-    });
+  // Google login handler - currently not used but ready for future implementation
+  // const handleGoogleLogin = async () => {
+  //   const { error } = await supabase.auth.signInWithOAuth({
+  //     provider: 'google',
+  //     options: {
+  //       redirectTo: `${window.location.origin}/dashboard`,
+  //     },
+  //   });
 
-    if (error) {
-      setMessage(error.message);
-    }
-  };
+  //   if (error) {
+  //     setMessage(error.message);
+  //   }
+  // };
 
   return (
     <div className="min-h-screen flex">
@@ -60,10 +61,13 @@ export default function Login() {
         
         {/* Main illustration area */}
         <div className="flex items-center justify-center w-full h-full relative z-10">
-          <img 
+          <Image 
             src="https://64.media.tumblr.com/798b1ae3e9f843b60ab8802813e9cb68/fc239968f5e39f7e-5b/s540x810/3d8643a8cba2b1d680c648fe871b56c14d5d9c27.gif"
             alt="Animated illustration"
+            width={540}
+            height={810}
             className="w-full h-full object-cover"
+            unoptimized
           />
         </div>
       </div>
@@ -170,7 +174,7 @@ export default function Login() {
 
             {/* Sign up link */}
             <div className="text-center">
-              <span className="text-gray-600">Don't have an account? </span>
+              <span className="text-gray-600">Don&apos;t have an account? </span>
               <Link href="/auth/signup" className="text-yellow-600 hover:text-yellow-700 font-medium">
                 Get Started
               </Link>

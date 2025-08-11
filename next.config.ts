@@ -1,7 +1,21 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  typescript: {
+    // Ignore TypeScript errors in scripts directory during build
+    ignoreBuildErrors: false,
+  },
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: '64.media.tumblr.com',
+        port: '',
+        pathname: '/**',
+      },
+    ],
+    unoptimized: true,
+  },
 };
 
 export default nextConfig;

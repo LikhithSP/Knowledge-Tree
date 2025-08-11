@@ -14,7 +14,12 @@ interface DashboardSummary {
   quizzesCompleted: number;
   hoursCompleted: number;
   totalTopics: number;
-  history: any[];
+  history: Array<{
+    id: string;
+    title: string;
+    date: string;
+    score?: number;
+  }>;
 }
 
 interface DashboardClientProps {

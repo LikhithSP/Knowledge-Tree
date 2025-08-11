@@ -2,7 +2,6 @@ import { createClient } from '@/lib/supabase/server';
 import { redirect } from 'next/navigation';
 
 import DashboardClient from './DashboardClient';
-import { UserProgress, Concept } from '@/types/database.types';
 
 export default async function Dashboard() {
   const supabase = await createClient();
