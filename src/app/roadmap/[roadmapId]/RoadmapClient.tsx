@@ -12,6 +12,7 @@ import ReactFlow, {
   Controls,
   Background,
   BackgroundVariant,
+  MarkerType,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 
@@ -72,15 +73,81 @@ export default function RoadmapClient({
     [dependencies, completedConceptIds]
   );
 
+  // Create a tree-like layout based on dependencies
+  const getNodePosition = useCallback((conceptId: string, allConcepts: Concept[], dependencies: ConceptDependency[]) => {
+    // Build dependency graph
+    const dependencyMap = new Map<string, string[]>();
+    const reverseDependencyMap = new Map<string, string[]>();
+    
+    // Initialize maps
+    allConcepts.forEach(concept => {
+      dependencyMap.set(concept.id, []);
+      reverseDependencyMap.set(concept.id, []);
+    });
+    
+    // Populate dependency maps
+    dependencies.forEach(dep => {
+      dependencyMap.get(dep.concept_id)?.push(dep.prerequisite_id);
+      reverseDependencyMap.get(dep.prerequisite_id)?.push(dep.concept_id);
+    });
+    
+    // Calculate levels (depth from root nodes)
+    const levels = new Map<string, number>();
+    const visited = new Set<string>();
+    
+    const calculateLevel = (nodeId: string): number => {
+      if (visited.has(nodeId)) return levels.get(nodeId) || 0;
+      visited.add(nodeId);
+      
+      const prerequisites = dependencyMap.get(nodeId) || [];
+      if (prerequisites.length === 0) {
+        levels.set(nodeId, 0);
+        return 0;
+      }
+      
+      const maxPrereqLevel = Math.max(...prerequisites.map(prereqId => calculateLevel(prereqId)));
+      const level = maxPrereqLevel + 1;
+      levels.set(nodeId, level);
+      return level;
+    };
+    
+    // Calculate levels for all concepts
+    allConcepts.forEach(concept => calculateLevel(concept.id));
+    
+    // Group concepts by level
+    const levelGroups = new Map<number, string[]>();
+    levels.forEach((level, conceptId) => {
+      if (!levelGroups.has(level)) {
+        levelGroups.set(level, []);
+      }
+      levelGroups.get(level)?.push(conceptId);
+    });
+    
+    // Calculate positions
+    const level = levels.get(conceptId) || 0;
+    const conceptsAtLevel = levelGroups.get(level) || [];
+    const indexAtLevel = conceptsAtLevel.indexOf(conceptId);
+    const totalAtLevel = conceptsAtLevel.length;
+    
+    // Tree layout positioning
+    const verticalSpacing = 200;
+    const horizontalSpacing = 400; // Increased from 300 to accommodate larger nodes
+    const centerOffset = (totalAtLevel - 1) * horizontalSpacing / 2;
+    
+    return {
+      x: indexAtLevel * horizontalSpacing - centerOffset + 400, // Center horizontally
+      y: level * verticalSpacing + 100
+    };
+  }, []);
+
   // Create nodes from concepts
   const initialNodes: ConceptNode[] = useMemo(() => {
-    return concepts.map((concept, index) => {
+    return concepts.map((concept) => {
       const isCompleted = completedConceptIds.has(concept.id);
       const isUnlocked = isConceptUnlocked(concept.id);
       
-      // Simple grid layout - you can improve this with a better layout algorithm
-      const x = (index % 4) * 250 + 100;
-      const y = Math.floor(index / 4) * 150 + 100;
+      // Use tree layout positioning
+      const { x, y } = getNodePosition(concept.id, concepts, dependencies);
 
       return {
         id: concept.id,
@@ -91,18 +158,27 @@ export default function RoadmapClient({
           isCompleted,
           isUnlocked,
           label: (
-            <div className="flex items-center space-x-2 p-3 min-w-0">
+            <div
+              className={`flex items-start space-x-4 p-6 min-w-0 transition-all duration-200 ${
+                isCompleted
+                  ? 'bg-yellow-50 border-yellow-400 shadow-md'
+                  : isUnlocked
+                  ? 'bg-white border-yellow-200 shadow'
+                  : 'bg-gray-100 border-gray-400 opacity-80'
+              } rounded-2xl border-2 w-80 min-h-[110px]`}
+              style={{ boxShadow: isCompleted || isUnlocked ? '0 4px 24px 0 rgba(0,0,0,0.04)' : undefined }}
+            >
               {isCompleted ? (
-                <CheckCircle2 className="h-5 w-5 text-green-600 flex-shrink-0" />
+                <CheckCircle2 className="h-8 w-8 text-yellow-500 flex-shrink-0 mt-1" />
               ) : isUnlocked ? (
-                <BookOpen className="h-5 w-5 text-blue-600 flex-shrink-0" />
+                <BookOpen className="h-8 w-8 text-yellow-400 flex-shrink-0 mt-1" />
               ) : (
-                <Lock className="h-5 w-5 text-gray-400 flex-shrink-0" />
+                <Lock className="h-8 w-8 text-gray-400 flex-shrink-0 mt-1" />
               )}
-              <div className="min-w-0">
-                <div className="font-medium text-sm truncate">{concept.title}</div>
+              <div className="min-w-0 flex-1">
+                <div className="font-bold text-lg text-gray-900 leading-tight mb-2">{concept.title}</div>
                 {concept.short_description && (
-                  <div className="text-xs text-gray-500 truncate">
+                  <div className="text-sm text-gray-500 leading-relaxed">
                     {concept.short_description}
                   </div>
                 )}
@@ -111,23 +187,16 @@ export default function RoadmapClient({
           ),
         },
         style: {
-          backgroundColor: isCompleted
-            ? '#dcfce7' // green-100
-            : isUnlocked
-            ? '#dbeafe' // blue-100
-            : '#f3f4f6', // gray-100
-          border: isCompleted
-            ? '2px solid #16a34a' // green-600
-            : isUnlocked
-            ? '2px solid #2563eb' // blue-600
-            : '2px solid #9ca3af', // gray-400
-          borderRadius: '8px',
+          border: 'none',
+          borderRadius: 22,
+          background: 'transparent',
+          boxShadow: 'none',
           cursor: isUnlocked ? 'pointer' : 'not-allowed',
-          opacity: isUnlocked ? 1 : 0.6,
+          opacity: isUnlocked ? 1 : 0.7,
         },
       };
     });
-  }, [concepts, completedConceptIds, isConceptUnlocked]);
+  }, [concepts, completedConceptIds, isConceptUnlocked, getNodePosition, dependencies]);
 
   // Create edges from dependencies
   const initialEdges: Edge[] = useMemo(() => {
@@ -137,7 +206,17 @@ export default function RoadmapClient({
       target: dep.concept_id,
       type: 'smoothstep',
       animated: false,
-      style: { stroke: '#6b7280' }, // gray-500
+      style: {
+        stroke: '#fde68a', // yellow-200
+        strokeWidth: 2,
+        borderRadius: 8,
+      },
+      markerEnd: {
+        type: MarkerType.ArrowClosed,
+        color: '#facc15', // yellow-400
+        width: 12,
+        height: 12,
+      },
     }));
   }, [dependencies]);
 
@@ -182,26 +261,35 @@ export default function RoadmapClient({
   return (
     <div className="h-screen flex flex-col">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b px-4 py-3">
-        <div className="flex items-center space-x-4">
+      <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200/50 px-6 py-4 shadow-sm">
+        <div className="flex items-center justify-between">
           <button
             onClick={() => router.push('/dashboard')}
-            className="flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+            className="group flex items-center space-x-3 text-gray-800 hover:text-gray-900 transition-all duration-200 px-4 py-2.5 rounded-xl bg-yellow-100 hover:bg-yellow-240 shadow-sm hover:shadow-md"
           >
-            <ArrowLeft className="h-5 w-5" />
-            <span>Back to Dashboard</span>
+            <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform duration-200" />
+            <span className="font-semibold">Dashboard</span>
           </button>
-          <div className="border-l border-gray-300 pl-4">
-            <h1 className="text-xl font-semibold text-gray-900">{roadmap.title}</h1>
-            {roadmap.description && (
-              <p className="text-sm text-gray-600">{roadmap.description}</p>
-            )}
+          
+          <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-4">
+            <div className="p-2 bg-yellow-100 rounded-lg">
+              <BookOpen className="h-6 w-6 text-yellow-600" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-gray-900 leading-tight">{roadmap.title}</h1>
+              {roadmap.description && (
+                <p className="text-sm text-gray-600 mt-1 max-w-md leading-relaxed">{roadmap.description}</p>
+              )}
+            </div>
           </div>
+
+          {/* Empty div to balance the layout */}
+          <div className="w-32"></div>
         </div>
       </header>
 
       {/* Roadmap Flow */}
-      <div className="flex-1">
+      <div className="flex-1 bg-gradient-to-br from-yellow-50 via-white to-gray-50">
         <ReactFlow
           nodes={nodes}
           edges={edges}
@@ -211,9 +299,16 @@ export default function RoadmapClient({
           onNodeClick={onNodeClick}
           fitView
           fitViewOptions={{ padding: 0.2 }}
+          panOnScroll
+          zoomOnScroll
         >
-          <Controls />
-          <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
+          <Controls style={{ background: 'rgba(255,255,255,0.8)', borderRadius: 12, boxShadow: '0 2px 8px 0 rgba(0,0,0,0.04)' }} />
+          <Background
+            variant={BackgroundVariant.Dots}
+            gap={18}
+            size={1.5}
+            color="#fde68a" // yellow-200
+          />
         </ReactFlow>
       </div>
 

@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
 
 export default function Login() {
@@ -72,7 +73,16 @@ export default function Login() {
         <div className="max-w-md w-full space-y-8">
           {/* Header */}
           <div className="text-left">
-            <h1 className="text-4xl font-bold text-gray-900 mb-2">Knowledge Tree</h1>
+            <div className="flex items-center space-x-3 mb-3">
+              <Image 
+                src="/logo.svg" 
+                alt="Knowledge Tree Logo" 
+                width={48} 
+                height={48}
+                className="w-12 h-12"
+              />
+              <h1 className="text-4xl font-bold text-gray-900">Knowledge Tree</h1>
+            </div>
             <h2 className="text-2xl font-semibold text-gray-700 mb-1">Welcome back!</h2>
             <p className="text-gray-600">Continue your learning journey by signing in</p>
           </div>

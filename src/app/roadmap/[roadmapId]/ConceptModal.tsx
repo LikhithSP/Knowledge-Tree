@@ -68,7 +68,7 @@ export default function ConceptModal({
     <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center p-4 z-50">
       <div className="bg-white rounded-3xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-hidden border border-yellow-100">
         {/* Header */}
-        <div className="bg-yellow-400 text-gray-900 p-5 flex items-center justify-between rounded-t-3xl">
+        <div className="bg-yellow-200 text-gray-900 p-5 flex items-center justify-between rounded-t-3xl">
           <div className="flex items-center space-x-3">
             <BookOpen className="h-7 w-7 text-yellow-700" />
             <h2 className="text-2xl font-bold tracking-tight">{concept.title}</h2>
