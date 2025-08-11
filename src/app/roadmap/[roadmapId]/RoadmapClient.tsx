@@ -19,8 +19,9 @@ import 'reactflow/dist/style.css';
 import { createClient } from '@/lib/supabase/client';
 import { Roadmap, Concept, ConceptDependency, UserProgress } from '@/types/database.types';
 import { User } from '@supabase/supabase-js';
-import { ArrowLeft, BookOpen, Lock, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, BookOpen, Lock, CheckCircle2, Loader2 } from 'lucide-react';
 import ConceptModal from './ConceptModal';
+import Link from 'next/link';
 
 interface RoadmapClientProps {
   roadmap: Roadmap;
@@ -49,12 +50,18 @@ export default function RoadmapClient({
   const supabase = createClient();
   const [selectedConcept, setSelectedConcept] = useState<Concept | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isNavigatingBack, setIsNavigatingBack] = useState(false);
 
   // Create a set of completed concept IDs for quick lookup
   const completedConceptIds = useMemo(
     () => new Set(userProgress.map((progress) => progress.concept_id)),
     [userProgress]
   );
+
+  const handleBackToDashboard = useCallback(() => {
+    setIsNavigatingBack(true);
+    router.push('/dashboard');
+  }, [router]);
 
   // Function to check if a concept is unlocked
   const isConceptUnlocked = useCallback(
@@ -263,13 +270,19 @@ export default function RoadmapClient({
       {/* Header */}
       <header className="bg-white/95 backdrop-blur-sm border-b border-gray-200/50 px-6 py-4 shadow-sm">
         <div className="flex items-center justify-between">
-          <button
-            onClick={() => router.push('/dashboard')}
-            className="group flex items-center space-x-3 px-4 py-2 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-all duration-200 shadow-sm hover:shadow-md"
+          <Link
+            href="/dashboard"
+            prefetch={true}
+            onClick={() => setIsNavigatingBack(true)}
+            className="group flex items-center space-x-3 px-4 py-2 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-all duration-200 shadow-sm hover:shadow-md disabled:opacity-50"
           >
-            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-200" />
-            <span>Dashboard</span>
-          </button>
+            {isNavigatingBack ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-200" />
+            )}
+            <span>{isNavigatingBack ? 'Going back...' : 'Dashboard'}</span>
+          </Link>
           
           <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-4">
             <div className="p-2 bg-yellow-100 rounded-lg">

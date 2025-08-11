@@ -92,7 +92,7 @@ export default function SignUp() {
         <div className="max-w-md w-full space-y-8">
           {/* Header */}
           <div className="text-left">
-            <div className="flex items-center space-x-3 mb-3">
+            <div className="flex items-center justify-center space-x-3 mb-3">
               <Image 
                 src="/logo.svg" 
                 alt="Knowledge Tree Logo" 
@@ -102,6 +102,8 @@ export default function SignUp() {
               />
               <h1 className="text-4xl font-bold text-gray-900">Knowledge Tree</h1>
             </div>
+            <br></br>
+            <br></br>
             <h2 className="text-2xl font-semibold text-gray-700 mb-1">Join us today!</h2>
             <p className="text-gray-600">Start your guided learning journey</p>
           </div>

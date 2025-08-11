@@ -5,8 +5,9 @@ import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Roadmap } from '@/types/database.types';
 import { User } from '@supabase/supabase-js';
-import { BookOpen, LogOut, User as UserIcon, Search } from 'lucide-react';
+import { BookOpen, LogOut, User as UserIcon, Search, Loader2 } from 'lucide-react';
 import Image from 'next/image';
+import Link from 'next/link';
 
 
 interface DashboardSummary {
@@ -32,14 +33,12 @@ export default function DashboardClient({ roadmaps, user, summary }: DashboardCl
   const router = useRouter();
   const supabase = createClient();
   const [searchQuery, setSearchQuery] = useState('');
+  const [navigatingTo, setNavigatingTo] = useState<string | null>(null);
 
   const handleLogout = async () => {
+    setNavigatingTo('logout');
     await supabase.auth.signOut();
     router.push('/auth/login');
-  };
-
-  const handleRoadmapClick = (roadmapId: string) => {
-    router.push(`/roadmap/${roadmapId}`);
   };
 
   // Filter roadmaps based on search query
@@ -72,10 +71,17 @@ export default function DashboardClient({ roadmaps, user, summary }: DashboardCl
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center space-x-2 text-red-600 bg-red-50 transition-colors duration-200 px-3 py-2 rounded-lg hover:text-red-700 hover:bg-red-100"
+                disabled={navigatingTo === 'logout'}
+                className="flex items-center space-x-2 text-red-600 bg-red-50 transition-colors duration-200 px-3 py-2 rounded-lg hover:text-red-700 hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed"
               >
-                <LogOut className="h-4 w-4" />
-                <span className="text-sm font-medium">Logout</span>
+                {navigatingTo === 'logout' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <LogOut className="h-4 w-4" />
+                )}
+                <span className="text-sm font-medium">
+                  {navigatingTo === 'logout' ? 'Logging out...' : 'Logout'}
+                </span>
               </button>
             </div>
           </div>
@@ -151,14 +157,21 @@ export default function DashboardClient({ roadmaps, user, summary }: DashboardCl
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {filteredRoadmaps.length > 0 ? (
             filteredRoadmaps.map((roadmap) => (
-              <div
+              <Link
                 key={roadmap.id}
-                onClick={() => handleRoadmapClick(roadmap.id)}
-                className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-300 hover:border-yellow-200 hover:-translate-y-1 overflow-hidden"
+                href={`/roadmap/${roadmap.id}`}
+                prefetch={true}
+                className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-200 cursor-pointer border border-gray-300 hover:border-yellow-200 hover:-translate-y-1 overflow-hidden block"
+                onClick={() => setNavigatingTo(roadmap.id)}
               >
-                <div className="p-8">
+                <div className="p-8 relative">
+                  {navigatingTo === roadmap.id && (
+                    <div className="absolute inset-0 bg-white/80 flex items-center justify-center z-10 rounded-2xl">
+                      <Loader2 className="h-8 w-8 text-yellow-600 animate-spin" />
+                    </div>
+                  )}
                   <div className="flex items-start mb-6">
-                    <div className="bg-gradient-to-br from-yellow-400 to-yellow-500 p-4 rounded-2xl shadow-lg group-hover:shadow-yellow-200 transition-shadow duration-300">
+                    <div className="bg-gradient-to-br from-yellow-400 to-yellow-500 p-4 rounded-2xl shadow-lg group-hover:shadow-yellow-200 transition-shadow duration-200">
                       <BookOpen className="h-8 w-8 text-white" />
                     </div>
                     <div className="ml-5 flex-1">
@@ -183,7 +196,7 @@ export default function DashboardClient({ roadmaps, user, summary }: DashboardCl
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))
           ) : (
             <div className="col-span-full text-center py-16">

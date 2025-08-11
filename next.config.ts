@@ -16,6 +16,12 @@ const nextConfig: NextConfig = {
     ],
     unoptimized: true,
   },
+  // Performance optimizations
+  experimental: {
+    optimizePackageImports: ['lucide-react', '@heroicons/react'],
+  },
+  // Optimize for faster page transitions
+  poweredByHeader: false,
 };
 
 export default nextConfig;
