@@ -265,10 +265,10 @@ export default function RoadmapClient({
         <div className="flex items-center justify-between">
           <button
             onClick={() => router.push('/dashboard')}
-            className="group flex items-center space-x-3 text-gray-800 hover:text-gray-900 transition-all duration-200 px-4 py-2.5 rounded-xl bg-yellow-100 hover:bg-yellow-240 shadow-sm hover:shadow-md"
+            className="group flex items-center space-x-3 px-4 py-2 rounded-full text-sm font-semibold bg-yellow-100 text-yellow-800 hover:bg-yellow-200 transition-all duration-200 shadow-sm hover:shadow-md"
           >
-            <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform duration-200" />
-            <span className="font-semibold">Dashboard</span>
+            <ArrowLeft className="h-4 w-4 group-hover:-translate-x-1 transition-transform duration-200" />
+            <span>Dashboard</span>
           </button>
           
           <div className="absolute left-1/2 transform -translate-x-1/2 flex items-center space-x-4">

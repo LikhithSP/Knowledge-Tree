@@ -83,7 +83,7 @@ export default function SignUp() {
       </div>
 
       {/* Right Side - Signup Form */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gray-50 px-8">
+      <div className="w-full lg:w-1/2 flex items-center justify-center bg-gradient-to-br from-yellow-50 via-white to-blue-50 px-8">
         <div className="max-w-md w-full space-y-8">
           {/* Header */}
           <div className="text-left">

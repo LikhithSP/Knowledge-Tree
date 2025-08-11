@@ -4,6 +4,13 @@ import { useState } from 'react';
 import { Concept, Quiz } from '@/types/database.types';
 import { X, BookOpen, CheckCircle2, RotateCcw } from 'lucide-react';
 
+// Helper function to decode HTML entities
+const decodeHtmlEntities = (text: string): string => {
+  const textarea = document.createElement('textarea');
+  textarea.innerHTML = text;
+  return textarea.value;
+};
+
 interface ConceptModalProps {
   concept: Concept;
   isOpen: boolean;
@@ -116,10 +123,10 @@ export default function ConceptModal({
         {/* Content */}
         <div className="p-8 overflow-y-auto max-h-[calc(90vh-180px)] bg-white">
           {currentTab === 'article' && (
-            <div className="prose max-w-none">
+            <div className="max-w-none">
               {concept.article_content ? (
                 <div
-                  className="text-gray-800 leading-relaxed"
+                  className="article-content text-gray-800"
                   dangerouslySetInnerHTML={{ __html: concept.article_content }}
                 />
               ) : (
@@ -168,7 +175,7 @@ export default function ConceptModal({
               {quiz.questions.map((question, questionIndex) => (
                 <div key={question.id} className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
                   <h4 className="font-semibold text-gray-900 mb-4 text-lg">
-                    {questionIndex + 1}. {question.question}
+                    {questionIndex + 1}. {decodeHtmlEntities(question.question)}
                   </h4>
                   <div className="space-y-3">
                     {question.options.map((option, optionIndex) => {
@@ -193,7 +200,7 @@ export default function ConceptModal({
                               : 'bg-white border-gray-200 text-gray-700 hover:bg-yellow-50'
                           }`}
                         >
-                          {option}
+                          {decodeHtmlEntities(option)}
                         </button>
                       );
                     })}
@@ -201,7 +208,7 @@ export default function ConceptModal({
                   {quizSubmitted && question.explanation && (
                     <div className="mt-4 p-4 bg-yellow-50 border-l-4 border-yellow-300 rounded-xl">
                       <p className="text-base text-yellow-800">
-                        <strong>Explanation:</strong> {question.explanation}
+                        <strong>Explanation:</strong> {decodeHtmlEntities(question.explanation)}
                       </p>
                     </div>
                   )}

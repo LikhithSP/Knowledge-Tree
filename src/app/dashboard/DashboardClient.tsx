@@ -44,7 +44,7 @@ export default function DashboardClient({ roadmaps, user, summary }: DashboardCl
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-yellow-50 via-white to-blue-50">
   {/* ...existing code... */}
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
@@ -67,7 +67,7 @@ export default function DashboardClient({ roadmaps, user, summary }: DashboardCl
               </div>
               <button
                 onClick={handleLogout}
-                className="flex items-center space-x-2 text-gray-500 hover:text-red-600 transition-colors duration-200 px-3 py-2 rounded-lg hover:bg-red-50"
+                className="flex items-center space-x-2 text-red-600 bg-red-50 transition-colors duration-200 px-3 py-2 rounded-lg hover:text-red-700 hover:bg-red-100"
               >
                 <LogOut className="h-4 w-4" />
                 <span className="text-sm font-medium">Logout</span>
@@ -90,27 +90,27 @@ export default function DashboardClient({ roadmaps, user, summary }: DashboardCl
           <div className="mb-8">
             <h3 className="text-xl font-bold text-gray-800 mb-4">Your Stats 🏆</h3>
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-              <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center text-center border border-yellow-100">
+              <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center text-center border border-gray-300">
                 <span className="text-3xl font-bold text-yellow-600 mb-1">{summary.topicsCompleted}</span>
                 <span className="text-gray-700 font-semibold">Topics Completed</span>
                 <span className="text-xs text-gray-400 mt-1">of {summary.totalTopics} total</span>
               </div>
-              <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center text-center border border-yellow-100">
+              <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center text-center border border-gray-300">
                 <span className="text-3xl font-bold text-yellow-600 mb-1">{summary.quizzesCompleted}</span>
                 <span className="text-gray-700 font-semibold">Quizzes Completed</span>
               </div>
-              <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center text-center border border-yellow-100">
+              <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center text-center border border-gray-300">
                 <span className="text-3xl font-bold text-yellow-600 mb-1">{summary.hoursCompleted}</span>
                 <span className="text-gray-700 font-semibold">Hours Learned</span>
               </div>
-              <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center text-center border border-yellow-100">
+              <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center text-center border border-gray-300">
                 <span className="text-3xl font-bold text-yellow-600 mb-1">{summary.history.length}</span>
                 <span className="text-gray-700 font-semibold">History Entries</span>
               </div>
             </div>
           </div>
           {/* Search Bar */}
-          <div className="relative max-w-md">
+          <div className="relative max-w-md mb-8">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <Search className="h-5 w-5 text-gray-400" />
             </div>
@@ -119,8 +119,14 @@ export default function DashboardClient({ roadmaps, user, summary }: DashboardCl
               placeholder="Search topics, roadmaps..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-gray-900 placeholder-gray-500 shadow-sm"
+              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-3xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-gray-900 placeholder-gray-500 shadow-sm"
             />
+          </div>
+          
+          {/* Learning Path Subheading */}
+          <div className="mb-6">
+            <h3 className="text-2xl font-bold text-gray-800">Learning Path</h3>
+            <p className="text-gray-600 mt-1">Choose your journey and start learning</p>
           </div>
         </div>
 
@@ -143,7 +149,7 @@ export default function DashboardClient({ roadmaps, user, summary }: DashboardCl
               <div
                 key={roadmap.id}
                 onClick={() => handleRoadmapClick(roadmap.id)}
-                className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-100 hover:border-yellow-200 hover:-translate-y-1 overflow-hidden"
+                className="group bg-white rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-300 hover:border-yellow-200 hover:-translate-y-1 overflow-hidden"
               >
                 <div className="p-8">
                   <div className="flex items-start mb-6">
