@@ -63,87 +63,57 @@ export default function RoadmapClient({
     router.push('/dashboard');
   }, [router]);
 
-  // Function to check if a concept is unlocked
+  // Function to check if a concept is unlocked (strict linear progression)
   const isConceptUnlocked = useCallback(
     (conceptId: string): boolean => {
-      // Check if this concept has any prerequisites
-      const prerequisites = dependencies.filter((dep) => dep.concept_id === conceptId);
+      // Sort concepts by creation order to establish a linear sequence
+      const orderedConcepts = [...concepts].sort((a, b) => 
+        new Date(a.created_at || '').getTime() - new Date(b.created_at || '').getTime()
+      );
       
-      if (prerequisites.length === 0) {
-        // No prerequisites, so it's unlocked
-        return true;
+      // Find the index of the current concept in the ordered list
+      const conceptIndex = orderedConcepts.findIndex(c => c.id === conceptId);
+      
+      if (conceptIndex === -1) return false;
+      
+      // First concept is always unlocked
+      if (conceptIndex === 0) return true;
+      
+      // Check if ALL previous concepts are completed
+      for (let i = 0; i < conceptIndex; i++) {
+        if (!completedConceptIds.has(orderedConcepts[i].id)) {
+          return false;
+        }
       }
-
-      // Check if all prerequisites are completed
-      return prerequisites.every((prereq) => completedConceptIds.has(prereq.prerequisite_id));
+      
+      return true;
     },
-    [dependencies, completedConceptIds]
+    [concepts, completedConceptIds]
   );
 
-  // Create a tree-like layout based on dependencies
-  const getNodePosition = useCallback((conceptId: string, allConcepts: Concept[], dependencies: ConceptDependency[]) => {
-    // Build dependency graph
-    const dependencyMap = new Map<string, string[]>();
-    const reverseDependencyMap = new Map<string, string[]>();
+  // Create a linear layout for sequential progression
+  const getNodePosition = useCallback((conceptId: string, allConcepts: Concept[]) => {
+    // Sort concepts by creation order to establish the sequence
+    const orderedConcepts = [...allConcepts].sort((a, b) => 
+      new Date(a.created_at || '').getTime() - new Date(b.created_at || '').getTime()
+    );
     
-    // Initialize maps
-    allConcepts.forEach(concept => {
-      dependencyMap.set(concept.id, []);
-      reverseDependencyMap.set(concept.id, []);
-    });
+    const conceptIndex = orderedConcepts.findIndex(c => c.id === conceptId);
     
-    // Populate dependency maps
-    dependencies.forEach(dep => {
-      dependencyMap.get(dep.concept_id)?.push(dep.prerequisite_id);
-      reverseDependencyMap.get(dep.prerequisite_id)?.push(dep.concept_id);
-    });
+    // Create a winding path layout
+    const nodeWidth = 400;
+    const nodeHeight = 200;
+    const nodesPerRow = 3; // Number of nodes per row
     
-    // Calculate levels (depth from root nodes)
-    const levels = new Map<string, number>();
-    const visited = new Set<string>();
+    const row = Math.floor(conceptIndex / nodesPerRow);
+    const col = conceptIndex % nodesPerRow;
     
-    const calculateLevel = (nodeId: string): number => {
-      if (visited.has(nodeId)) return levels.get(nodeId) || 0;
-      visited.add(nodeId);
-      
-      const prerequisites = dependencyMap.get(nodeId) || [];
-      if (prerequisites.length === 0) {
-        levels.set(nodeId, 0);
-        return 0;
-      }
-      
-      const maxPrereqLevel = Math.max(...prerequisites.map(prereqId => calculateLevel(prereqId)));
-      const level = maxPrereqLevel + 1;
-      levels.set(nodeId, level);
-      return level;
-    };
-    
-    // Calculate levels for all concepts
-    allConcepts.forEach(concept => calculateLevel(concept.id));
-    
-    // Group concepts by level
-    const levelGroups = new Map<number, string[]>();
-    levels.forEach((level, conceptId) => {
-      if (!levelGroups.has(level)) {
-        levelGroups.set(level, []);
-      }
-      levelGroups.get(level)?.push(conceptId);
-    });
-    
-    // Calculate positions
-    const level = levels.get(conceptId) || 0;
-    const conceptsAtLevel = levelGroups.get(level) || [];
-    const indexAtLevel = conceptsAtLevel.indexOf(conceptId);
-    const totalAtLevel = conceptsAtLevel.length;
-    
-    // Tree layout positioning
-    const verticalSpacing = 200;
-    const horizontalSpacing = 400; // Increased from 300 to accommodate larger nodes
-    const centerOffset = (totalAtLevel - 1) * horizontalSpacing / 2;
+    // Alternate direction for each row (snake pattern)
+    const actualCol = row % 2 === 0 ? col : (nodesPerRow - 1 - col);
     
     return {
-      x: indexAtLevel * horizontalSpacing - centerOffset + 400, // Center horizontally
-      y: level * verticalSpacing + 100
+      x: actualCol * nodeWidth + 200,
+      y: row * nodeHeight + 100
     };
   }, []);
 
@@ -153,8 +123,8 @@ export default function RoadmapClient({
       const isCompleted = completedConceptIds.has(concept.id);
       const isUnlocked = isConceptUnlocked(concept.id);
       
-      // Use tree layout positioning
-      const { x, y } = getNodePosition(concept.id, concepts, dependencies);
+      // Use linear layout positioning
+      const { x, y } = getNodePosition(concept.id, concepts);
 
       return {
         id: concept.id,
@@ -203,29 +173,44 @@ export default function RoadmapClient({
         },
       };
     });
-  }, [concepts, completedConceptIds, isConceptUnlocked, getNodePosition, dependencies]);
+  }, [concepts, completedConceptIds, isConceptUnlocked, getNodePosition]);
 
-  // Create edges from dependencies
+  // Create edges for linear progression (each concept connects to the next)
   const initialEdges: Edge[] = useMemo(() => {
-    return dependencies.map((dep) => ({
-      id: `${dep.prerequisite_id}-${dep.concept_id}`,
-      source: dep.prerequisite_id,
-      target: dep.concept_id,
-      type: 'smoothstep',
-      animated: false,
-      style: {
-        stroke: '#fde68a', // yellow-200
-        strokeWidth: 2,
-        borderRadius: 8,
-      },
-      markerEnd: {
-        type: MarkerType.ArrowClosed,
-        color: '#facc15', // yellow-400
-        width: 12,
-        height: 12,
-      },
-    }));
-  }, [dependencies]);
+    // Sort concepts by creation order
+    const orderedConcepts = [...concepts].sort((a, b) => 
+      new Date(a.created_at || '').getTime() - new Date(b.created_at || '').getTime()
+    );
+    
+    const edges: Edge[] = [];
+    
+    // Connect each concept to the next one in sequence
+    for (let i = 0; i < orderedConcepts.length - 1; i++) {
+      const currentConcept = orderedConcepts[i];
+      const nextConcept = orderedConcepts[i + 1];
+      
+      edges.push({
+        id: `${currentConcept.id}-${nextConcept.id}`,
+        source: currentConcept.id,
+        target: nextConcept.id,
+        type: 'smoothstep',
+        animated: false,
+        style: {
+          stroke: '#fde68a', // yellow-200
+          strokeWidth: 3,
+          borderRadius: 8,
+        },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          color: '#facc15', // yellow-400
+          width: 14,
+          height: 14,
+        },
+      });
+    }
+    
+    return edges;
+  }, [concepts]);
 
   const [nodes, , onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
