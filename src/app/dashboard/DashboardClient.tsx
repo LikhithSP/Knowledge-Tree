@@ -7,12 +7,22 @@ import { Roadmap } from '@/types/database.types';
 import { User } from '@supabase/supabase-js';
 import { BookOpen, LogOut, User as UserIcon, Search } from 'lucide-react';
 
+
+interface DashboardSummary {
+  topicsCompleted: number;
+  quizzesCompleted: number;
+  hoursCompleted: number;
+  totalTopics: number;
+  history: any[];
+}
+
 interface DashboardClientProps {
   roadmaps: Roadmap[];
   user: User;
+  summary: DashboardSummary;
 }
 
-export default function DashboardClient({ roadmaps, user }: DashboardClientProps) {
+export default function DashboardClient({ roadmaps, user, summary }: DashboardClientProps) {
   const router = useRouter();
   const supabase = createClient();
   const [searchQuery, setSearchQuery] = useState('');
@@ -34,6 +44,7 @@ export default function DashboardClient({ roadmaps, user }: DashboardClientProps
 
   return (
     <div className="min-h-screen bg-gray-50">
+  {/* ...existing code... */}
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -62,12 +73,34 @@ export default function DashboardClient({ roadmaps, user }: DashboardClientProps
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="mb-8">
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
-            Welcome back to your learning journey!
+            Welcome back to your learning journey!👋🏻
           </h2>
           <p className="text-lg text-gray-600 mb-6">
             Choose a roadmap to continue exploring new concepts and unlocking knowledge.
           </p>
-          
+          {/* Your Stats */}
+          <div className="mb-8">
+            <h3 className="text-xl font-bold text-gray-800 mb-4">Your Stats 🏆</h3>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+              <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center text-center border border-yellow-100">
+                <span className="text-3xl font-bold text-yellow-600 mb-1">{summary.topicsCompleted}</span>
+                <span className="text-gray-700 font-semibold">Topics Completed</span>
+                <span className="text-xs text-gray-400 mt-1">of {summary.totalTopics} total</span>
+              </div>
+              <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center text-center border border-yellow-100">
+                <span className="text-3xl font-bold text-yellow-600 mb-1">{summary.quizzesCompleted}</span>
+                <span className="text-gray-700 font-semibold">Quizzes Completed</span>
+              </div>
+              <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center text-center border border-yellow-100">
+                <span className="text-3xl font-bold text-yellow-600 mb-1">{summary.hoursCompleted}</span>
+                <span className="text-gray-700 font-semibold">Hours Learned</span>
+              </div>
+              <div className="bg-white rounded-2xl shadow p-6 flex flex-col items-center text-center border border-yellow-100">
+                <span className="text-3xl font-bold text-yellow-600 mb-1">{summary.history.length}</span>
+                <span className="text-gray-700 font-semibold">History Entries</span>
+              </div>
+            </div>
+          </div>
           {/* Search Bar */}
           <div className="relative max-w-md">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
