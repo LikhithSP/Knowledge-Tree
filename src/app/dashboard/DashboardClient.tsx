@@ -1,10 +1,11 @@
 'use client';
 
+import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import { Roadmap } from '@/types/database.types';
 import { User } from '@supabase/supabase-js';
-import { BookOpen, LogOut, User as UserIcon } from 'lucide-react';
+import { BookOpen, LogOut, User as UserIcon, Search } from 'lucide-react';
 
 interface DashboardClientProps {
   roadmaps: Roadmap[];
@@ -14,6 +15,7 @@ interface DashboardClientProps {
 export default function DashboardClient({ roadmaps, user }: DashboardClientProps) {
   const router = useRouter();
   const supabase = createClient();
+  const [searchQuery, setSearchQuery] = useState('');
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
@@ -23,6 +25,12 @@ export default function DashboardClient({ roadmaps, user }: DashboardClientProps
   const handleRoadmapClick = (roadmapId: string) => {
     router.push(`/roadmap/${roadmapId}`);
   };
+
+  // Filter roadmaps based on search query
+  const filteredRoadmaps = roadmaps.filter(roadmap =>
+    roadmap.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+    (roadmap.description && roadmap.description.toLowerCase().includes(searchQuery.toLowerCase()))
+  );
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -56,15 +64,41 @@ export default function DashboardClient({ roadmaps, user }: DashboardClientProps
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Welcome back to your learning journey!
           </h2>
-          <p className="text-lg text-gray-600">
+          <p className="text-lg text-gray-600 mb-6">
             Choose a roadmap to continue exploring new concepts and unlocking knowledge.
           </p>
+          
+          {/* Search Bar */}
+          <div className="relative max-w-md">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="h-5 w-5 text-gray-400" />
+            </div>
+            <input
+              type="text"
+              placeholder="Search topics, roadmaps..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-10 pr-4 py-3 bg-white border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-transparent text-gray-900 placeholder-gray-500 shadow-sm"
+            />
+          </div>
         </div>
+
+        {/* Results count */}
+        {searchQuery && (
+          <div className="mb-6">
+            <p className="text-sm text-gray-600">
+              {filteredRoadmaps.length === 0 
+                ? `No results found for "${searchQuery}"` 
+                : `Found ${filteredRoadmaps.length} ${filteredRoadmaps.length === 1 ? 'roadmap' : 'roadmaps'} for "${searchQuery}"`
+              }
+            </p>
+          </div>
+        )}
 
         {/* Roadmaps Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {roadmaps.length > 0 ? (
-            roadmaps.map((roadmap) => (
+          {filteredRoadmaps.length > 0 ? (
+            filteredRoadmaps.map((roadmap) => (
               <div
                 key={roadmap.id}
                 onClick={() => handleRoadmapClick(roadmap.id)}
@@ -103,14 +137,29 @@ export default function DashboardClient({ roadmaps, user }: DashboardClientProps
             <div className="col-span-full text-center py-16">
               <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-12 max-w-md mx-auto">
                 <div className="bg-gray-100 p-6 rounded-2xl w-fit mx-auto mb-6">
-                  <BookOpen className="h-16 w-16 text-gray-400 mx-auto" />
+                  {searchQuery ? (
+                    <Search className="h-16 w-16 text-gray-400 mx-auto" />
+                  ) : (
+                    <BookOpen className="h-16 w-16 text-gray-400 mx-auto" />
+                  )}
                 </div>
                 <h3 className="text-xl font-bold text-gray-900 mb-3">
-                  No roadmaps available yet
+                  {searchQuery ? `No results found for "${searchQuery}"` : 'No roadmaps available yet'}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
-                  Roadmaps will appear here once they are created. Check back soon to start your learning journey!
+                  {searchQuery 
+                    ? 'Try searching with different keywords or browse all available roadmaps.'
+                    : 'Roadmaps will appear here once they are created. Check back soon to start your learning journey!'
+                  }
                 </p>
+                {searchQuery && (
+                  <button
+                    onClick={() => setSearchQuery('')}
+                    className="mt-4 px-4 py-2 bg-yellow-600 text-white rounded-lg hover:bg-yellow-700 transition-colors duration-200 font-medium"
+                  >
+                    Clear Search
+                  </button>
+                )}
               </div>
             </div>
           )}
